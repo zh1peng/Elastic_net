@@ -13,6 +13,12 @@ Elastic net function from Sklearn is super slow compared with glmnet
 
 self defined parallel cross validation was added to boost the speed
 
+
+### interpret_results
+
+select significant beta against null model built by permutation. show heat maps for the resutls
+
+
 ## To do list
 1. Choose variable that no need to be normalized and winsorized
 2. Multiple resposne (possibly a seperate file)
