@@ -66,7 +66,7 @@ clf.fit(X,y)
 clf.diagnostic_plot1()
 clf.diagnostic_plot2()
 
-# Test with Real data [Structual data predict age]
+# Test with Real data [Structual fMRI data]
 from scipy.io import loadmat
 X=loadmat('brain_data.mat')['X']
 y=loadmat('brain_data.mat')['y']
