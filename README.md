@@ -8,12 +8,12 @@ Elastic net function from Sklearn is super slow compared with glmnet
 
 [Glmnet python version](https://glmnet-python.readthedocs.io/en/latest/) was put in the sklearn fashion
 
-## 
+---
 ### glmnet_funs_v2_parallel
 
 self defined parallel cross validation was added to boost the speed
 
-
+---
 ### glmnet_funs_v3 12.6
 
 feature added: 
@@ -32,15 +32,15 @@ If using CSV file, using 'flag' in the feature name, then that feature *will not
 
 2. allow the multiple response target prediction
 
-
+--
 ### interpret_results
 
 select and plot significant beta against null model built by permutation.
 
 ![sample](https://github.com/zh1peng/Elastic_net/blob/master/SRC_pics/20181128124109.png)
 
-
-### test code and data
+---
+### Test code
 ```python
 # Test with multi-response [Data provided by glmnet]
 import scipy
@@ -72,7 +72,7 @@ X=loadmat('brain_data.mat')['X']
 y=loadmat('brain_data.mat')['y']
 ```
 
-
+---
 ## To do list
 ~~1. Choose variable that no need to be normalized and winsorized~~
 
@@ -80,4 +80,4 @@ y=loadmat('brain_data.mat')['y']
 
 3. classification (possibly a seperate file)
 
-4. Manual on how to use
+~~4. Manual on how to use~~
