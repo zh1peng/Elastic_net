@@ -32,7 +32,7 @@ If using CSV file, using 'flag' in the feature name, then that feature *will not
 
 2. allow the multiple response target prediction
 
---
+---
 ### interpret_results.py
 
 select and plot significant beta against null model built by permutation.
