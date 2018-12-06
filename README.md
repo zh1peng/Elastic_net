@@ -75,6 +75,9 @@ y=loadmat('brain_data.mat')['y']
 
 ## To do list
 ~~1. Choose variable that no need to be normalized and winsorized~~
+
 ~~2. Multiple resposne (possibly a seperate file)~~
+
 3. classification (possibly a seperate file)
+
 4. Manual on how to use
