@@ -341,6 +341,21 @@ def once_csv_pred_test(data_csv):
         fo.write('\r\n filename---{} r---: {} p---: {} time--: {} \r\n'.format(csv_name, r_value, p_value, e_time))
     return r_value, p_value, e_time
 
+def only_make_plot(data_csv):
+    csv_name, ext = os.path.splitext(data_csv)
+    start_time=time.time()
+    all_df=pd.read_csv(data_csv)
+    flag_y=[col for col in all_df.columns if 'y_' in col]
+    y=np.array(all_df[flag_y])
+    fs_df=all_df.drop(columns=flag_y)
+    
+    # find col idx that with 'flag' indicating no need to normalize the col
+    flag_col=np.array([idx for idx, col in enumerate(fs_df.columns) if 'flag' in col])
+    fs=np.array(fs_df)
+    clf=glmnet_wrapper(not2preprocess=flag_col)
+    clf.fit(scipy.float64(fs), scipy.float64(y))
+    clf.diagnostic_plot1(csv_name+'1.png')
+    
 def batch_csv_pred_test(data_path):
     os.chdir(data_path)
     filenames = os.listdir(data_path)
@@ -401,6 +416,8 @@ if '__main__'==__name__:
         e = int(time.time() - start_time)
         print('\rTime elapsed:{:02d}:{:02d}:{:02d}'.format(e // 3600, (e % 3600 // 60), e % 60)+'\r')
         np.save('permutation_results.npy', results)
+    elif sys.argv[1]=='-plot':
+        only_make_plot(sys.argv[2])
 
 
 
