@@ -312,6 +312,8 @@ def repeated_parallel_cv(clf_in,X,y,Nfold=10,rep=50,shuffle_y=False):
     return results
 
 def corr_y(y_pred,y):
+    if np.ndim(y_pred)==1:
+        y_pred=y_pred[:,None]
     y_dim=y.shape[-1]
     r_value=np.empty((y.shape[-1]))*np.nan
     p_value=np.empty((y.shape[-1]))*np.nan
