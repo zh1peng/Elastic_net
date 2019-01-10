@@ -132,7 +132,7 @@ class glmnet_wrapper(BaseEstimator):
     def fit(self, X, y):
         # only normalize and winsorize selected features
         # but fit using all features
-        if self.not2preprocess==None:
+        if self.not2preprocess is None:
             X2use=X.copy()
             X2win=self.sd.fit_transform(X2use)
             self.win.fit(X2win)
@@ -178,7 +178,7 @@ class glmnet_wrapper(BaseEstimator):
         self.best_lambda=lambdas[min_cvm_idx]
         return self         
     def predict(self, X):
-        if self.not2preprocess==None:
+        if self.not2preprocess is None:
             X2use=X.copy()
             X2win=self.sd.transform(X2use)
             X_win=self.win.transform(X2win)
@@ -289,6 +289,7 @@ def repeated_parallel_cv(clf_in,X,y,Nfold=10,rep=50,shuffle_y=False):
     all_score=[]
     seed0=np.random.randint(1000,size=1)
     for rep_i in range(rep):
+        print('running~~~~~~~~~~'+str(rep_i+1)+' rep')
         if shuffle_y:
             seed1=seed0+np.random.randint(100,size=1)
             y2use=shuffle(y.copy(),random_state=int(seed1))
@@ -355,7 +356,7 @@ def only_make_plot(data_csv):
     clf=glmnet_wrapper(not2preprocess=flag_col)
     clf.fit(scipy.float64(fs), scipy.float64(y))
     clf.diagnostic_plot1(csv_name+'1.png')
-    
+
 def batch_csv_pred_test(data_path):
     os.chdir(data_path)
     filenames = os.listdir(data_path)
@@ -378,10 +379,15 @@ def batch_csv_pred_test(data_path):
 def repeat_EN_csv(data_csv,reps=50,shuffle_mark=False):
 #    repeated_cross_validate(clf_in,X,y,cv_fold=10,rep=50)
     csv_name, ext = os.path.splitext(data_csv)
-    all_data=pd.read_csv(data_csv)
-    y=np.array((all_data['y']))
-    fs=np.array(all_data.drop(columns=['y']))
-    results=repeated_parallel_cv(glmnet_wrapper(),scipy.float64(fs),scipy.float64(y),Nfold=10,rep=reps,shuffle_y=shuffle_mark)
+    all_df=pd.read_csv(data_csv)
+    flag_y=[col for col in all_df.columns if 'y_' in col]
+    y=np.array(all_df[flag_y])
+    fs_df=all_df.drop(columns=flag_y)
+    # find col idx that with 'flag' indicating no need to normalize the col
+    flag_col=np.array([idx for idx, col in enumerate(fs_df.columns) if 'flag' in col])
+    fs=np.array(fs_df)
+    clf=glmnet_wrapper(not2preprocess=flag_col)
+    results=repeated_parallel_cv(clf,scipy.float64(fs),scipy.float64(y),Nfold=10,rep=reps,shuffle_y=shuffle_mark)
     return results
 
 if '__main__'==__name__:
@@ -403,19 +409,23 @@ if '__main__'==__name__:
         print(results)
         print('\rTime elapsed:{:02d}:{:02d}:{:02d}'.format(e // 3600, (e % 3600 // 60), e % 60)+'\r')
     elif sys.argv[1]=='-repeat':
+        csv_name, ext = os.path.splitext(sys.argv[2])
         start_time=time.time()
         results=repeat_EN_csv(sys.argv[2],reps=int(sys.argv[3]),shuffle_mark=False)
         e = int(time.time() - start_time)
         print('\rTime elapsed:{:02d}:{:02d}:{:02d}'.format(e // 3600, (e % 3600 // 60), e % 60)+'\r')
-        np.save('repeat_cv_results.npy', results)
-        r_value, p_value=scipy.stats.pearsonr(results['mean_y_pred'],results['true_y'])
+        np.save(csv_name+'_repeat_'+sys.argv[3]+'_cv_results.npy', results)
+        r_value, p_value=corr_y(results['mean_y_pred'],results['true_y'])
         print('\rMean Predict y across {} repeats, correlation is:{},{}'.format(sys.argv[3], r_value, p_value))
     elif sys.argv[1]=='-permutation':
+        csv_name, ext = os.path.splitext(sys.argv[2])
         start_time=time.time()
         results=repeat_EN_csv(sys.argv[2],reps=int(sys.argv[3]),shuffle_mark=True)
         e = int(time.time() - start_time)
         print('\rTime elapsed:{:02d}:{:02d}:{:02d}'.format(e // 3600, (e % 3600 // 60), e % 60)+'\r')
-        np.save('permutation_results.npy', results)
+        np.save(csv_name+'_permutation_'+sys.argv[3]+'_results.npy', results)
+        r_value, p_value=corr_y(results['mean_y_pred'],results['true_y'])
+        print('\rMean Predict y across {} repeats, correlation is:{},{}'.format(sys.argv[3], r_value, p_value))
     elif sys.argv[1]=='-plot':
         only_make_plot(sys.argv[2])
 
